@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/navigation";
+import Script from "next/script";
+import { GA_TRACKING_ID } from "@/lib/gtag";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,6 +27,30 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      {/* Google Analytics */}
+      {GA_TRACKING_ID && (
+        <>
+          <Script
+            strategy="afterInteractive"
+            src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+          />
+          <Script
+            id="gtag-init"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA_TRACKING_ID}', {
+                  page_location: window.location.href,
+                  page_title: document.title,
+                });
+              `,
+            }}
+          />
+        </>
+      )}
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-100`}
         suppressHydrationWarning={true}

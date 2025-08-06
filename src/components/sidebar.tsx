@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { cn } from '@/lib/utils'
 
 const categories = [
@@ -12,7 +12,7 @@ const categories = [
   { name: 'Valuation', slug: 'valuation', count: 0 },
 ]
 
-export function Sidebar() {
+function SidebarContent() {
   const searchParams = useSearchParams()
   const [mounted, setMounted] = useState(false)
   const [currentCategory, setCurrentCategory] = useState('')
@@ -77,5 +77,36 @@ export function Sidebar() {
         </div>
       </div>
     </aside>
+  )
+}
+
+export function Sidebar() {
+  return (
+    <Suspense fallback={
+      <aside className="w-56 flex-shrink-0">
+        <div className="sticky top-24">
+          <div className="bg-slate-200 p-6 rounded-2xl border border-slate-300">
+            <h3 className="text-lg font-semibold text-slate-800 mb-6">Categories</h3>
+            <nav className="space-y-2">
+              {categories.map((category) => (
+                <div
+                  key={category.slug}
+                  className="block px-4 py-3 text-sm font-medium rounded-xl text-slate-700"
+                >
+                  <div className="flex justify-between items-center">
+                    <span>{category.name}</span>
+                    <span className="text-xs px-2 py-1 rounded-full font-medium bg-slate-300 text-slate-700">
+                      {category.count}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </nav>
+          </div>
+        </div>
+      </aside>
+    }>
+      <SidebarContent />
+    </Suspense>
   )
 }
